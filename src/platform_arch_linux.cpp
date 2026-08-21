@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstring>
+#include <dlfcn.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -54,5 +55,25 @@ namespace platform
         close(fileDescriptor);
 
         return true;
+    }
+
+    void* openLibrary(const char* path)
+    {
+        return dlopen(path, RTLD_NOW | RTLD_LOCAL);
+    }
+
+    void* loadLibraryFunction(void* handle, const char* name)
+    {
+        if (!handle)
+        {
+            return nullptr;
+        }
+
+        return dlsym(handle, name);
+    }
+
+    bool closeLibrary(void* handle)
+    {
+        return ( dlclose(handle) == 0 );
     }
 }
