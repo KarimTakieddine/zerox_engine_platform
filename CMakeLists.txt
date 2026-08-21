@@ -9,7 +9,7 @@ set(SRC_DIR src)
 Project(${PROJECT_NAME})
 
 if (WIN32)
-else()
+elseif(LINUX)
     list(APPEND SOURCES
         ${SRC_DIR}/platform_arch_linux.cpp)
 endif()
