@@ -14,6 +14,6 @@ elseif(LINUX)
         ${SRC_DIR}/platform_arch_linux.cpp)
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
