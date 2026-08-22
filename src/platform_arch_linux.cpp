@@ -81,7 +81,7 @@ namespace platform
         return ( dlclose(handle) == 0 );
     }
 
-    bool initFileWriteEvent(const char* path, FileWriteEvent* event)
+    bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event)
     {
         int eventDescriptor = inotify_init1(IN_NONBLOCK);
         if (eventDescriptor < 0)
@@ -91,7 +91,7 @@ namespace platform
 
         event->eventDescriptor = eventDescriptor;
 
-        int watchDescriptor = inotify_add_watch(eventDescriptor, path, IN_CLOSE_WRITE);
+        int watchDescriptor = inotify_add_watch(eventDescriptor, parentDirectory, IN_CLOSE_WRITE | IN_CREATE | IN_MOVED_TO);
         if (watchDescriptor < 0)
         {
             close(eventDescriptor);
@@ -108,7 +108,8 @@ namespace platform
             return false;
         }
 
-        event->shutdownDescriptor = shutdownDescriptor;
+        event->shutdownDescriptor   = shutdownDescriptor;
+        event->targetFilename       = targetFilename;
 
         return true;
     }
@@ -144,14 +145,14 @@ namespace platform
 
                 while (i < length)
                 {
-                    auto* event = reinterpret_cast<struct inotify_event*>(&buffer[i]);
+                    auto* os_event = reinterpret_cast<struct inotify_event*>(&buffer[i]);
                     
-                    if (event->mask & IN_CLOSE_WRITE)
+                    if ( ( os_event->mask & ( IN_CLOSE_WRITE | IN_CREATE | IN_MOVED_TO ) ) && ( strcmp(os_event->name, event->targetFilename) == 0 ) )
                     {
                         writeCounter->fetch_add(1, std::memory_order_release);
                     }
 
-                    i += sizeof(struct inotify_event) + event->len;
+                    i += sizeof(struct inotify_event) + os_event->len;
                 }
             }
         }
