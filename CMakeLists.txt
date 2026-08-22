@@ -17,3 +17,5 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE uring)

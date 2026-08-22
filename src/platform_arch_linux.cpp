@@ -2,10 +2,14 @@
 #include <cstring>
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <unistd.h>
-
+#include <liburing.h>
+#include <poll.h>
+#include <stdalign.h>
+#include <sys/inotify.h>
+#include <sys/eventfd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "platform.h"
 
@@ -75,5 +79,101 @@ namespace platform
     bool closeLibrary(void* handle)
     {
         return ( dlclose(handle) == 0 );
+    }
+
+    bool initFileWriteEvent(const char* path, FileWriteEvent* event)
+    {
+        int eventDescriptor = inotify_init1(IN_NONBLOCK);
+        if (eventDescriptor < 0)
+        {
+            return false;
+        }
+
+        event->eventDescriptor = eventDescriptor;
+
+        int watchDescriptor = inotify_add_watch(eventDescriptor, path, IN_CLOSE_WRITE);
+        if (watchDescriptor < 0)
+        {
+            close(eventDescriptor);
+            return false;
+        }
+
+        event->watchDescriptor = watchDescriptor;
+
+        int shutdownDescriptor = eventfd(0, EFD_NONBLOCK);
+        if (shutdownDescriptor < 0)
+        {
+            inotify_rm_watch(eventDescriptor, watchDescriptor);
+            close(eventDescriptor);
+            return false;
+        }
+
+        event->shutdownDescriptor = shutdownDescriptor;
+
+        return true;
+    }
+
+    bool watchFileWrites(const char* path, const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter)
+    {
+        pollfd fds[2] = {
+            { .fd = event->eventDescriptor, .events = POLL_IN },
+            { .fd = event->shutdownDescriptor, .events = POLL_IN }
+        };
+
+        alignas(struct inotify_event) char buffer[4096];
+
+        const int ret = poll(fds, 2, -1);
+
+        if (ret < 0 && errno != EINTR)
+        {
+            return false;
+        }
+
+        if (fds[1].revents & POLLIN)
+        {
+            return true;
+        }
+
+        if (fds[0].revents & POLLIN)
+        {
+            ssize_t length = read(event->eventDescriptor, buffer, sizeof(buffer));
+
+            if (length > 0)
+            {
+                ssize_t i = 0;
+
+                while (i < length)
+                {
+                    auto* event = reinterpret_cast<struct inotify_event*>(&buffer[i]);
+                    
+                    if (event->mask & IN_CLOSE_WRITE)
+                    {
+                        writeCounter->fetch_add(1, std::memory_order_release);
+                    }
+
+                    i += sizeof(struct inotify_event) + event->len;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    void closeFileWriteEvent(const FileWriteEvent* event)
+    {
+        inotify_rm_watch(event->eventDescriptor, event->watchDescriptor);
+        close(event->shutdownDescriptor);
+        close(event->eventDescriptor);
+    }
+
+    bool stopFileWatch(const FileWriteEvent* event)
+    {
+        if (event->shutdownDescriptor < 0)
+        {
+            return false;
+        }
+
+        uint64_t u{ 1 };
+        return write(event->shutdownDescriptor, &u, sizeof(uint64_t)) > 0;
     }
 }
