@@ -74,7 +74,14 @@ namespace platform
 
     std::unique_ptr<LibraryHandle> openLibrary(const char* path)
     {
-        return std::make_unique<LibraryHandle>(dlopen(path, RTLD_NOW | RTLD_LOCAL));
+        void* handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
+
+        if (!handle)
+        {
+            return nullptr;
+        }
+
+        return std::make_unique<LibraryHandle>(handle);
     }
 
     void* loadLibraryFunction(const LibraryHandle* handle, const char* name)
@@ -91,7 +98,7 @@ namespace platform
 
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event)
     {
-        int eventDescriptor = inotify_init1(IN_NONBLOCK);
+        const int eventDescriptor = inotify_init1(IN_NONBLOCK);
         if (eventDescriptor < 0)
         {
             return false;
@@ -99,7 +106,7 @@ namespace platform
 
         event->eventDescriptor = eventDescriptor;
 
-        int watchDescriptor = inotify_add_watch(eventDescriptor, parentDirectory, IN_CLOSE_WRITE | IN_CREATE | IN_MOVED_TO);
+        const int watchDescriptor = inotify_add_watch(eventDescriptor, parentDirectory, IN_CLOSE_WRITE | IN_CREATE | IN_MOVED_TO);
         if (watchDescriptor < 0)
         {
             close(eventDescriptor);
@@ -108,7 +115,7 @@ namespace platform
 
         event->watchDescriptor = watchDescriptor;
 
-        int shutdownDescriptor = eventfd(0, EFD_NONBLOCK);
+        const int shutdownDescriptor = eventfd(0, EFD_NONBLOCK);
         if (shutdownDescriptor < 0)
         {
             inotify_rm_watch(eventDescriptor, watchDescriptor);
@@ -145,7 +152,7 @@ namespace platform
 
         if (fds[0].revents & POLLIN)
         {
-            ssize_t length = read(event->eventDescriptor, buffer, sizeof(buffer));
+            const ssize_t length = read(event->eventDescriptor, buffer, sizeof(buffer));
 
             if (length > 0)
             {
@@ -182,20 +189,20 @@ namespace platform
             return false;
         }
 
-        uint64_t u{ 1 };
+        const uint64_t u{ 1 };
         return write(event->shutdownDescriptor, &u, sizeof(uint64_t)) > 0;
     }
 
     bool copyFile(const char* source, const char* destination)
     {
-        int src_fd = open(source, O_RDONLY);
+        const int src_fd = open(source, O_RDONLY);
 
         if (src_fd < 0)
         {
             return false;
         }
 
-        int dest_fd = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        const int dest_fd = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         if (dest_fd < 0) {
             close(src_fd);
             return false;
@@ -203,11 +210,17 @@ namespace platform
 
         const size_t destinationSize = getFileSize(source);
 
-        loff_t bytes_sent = sendfile(dest_fd, src_fd, nullptr, destinationSize);
+        const loff_t bytes_sent = sendfile(dest_fd, src_fd, nullptr, destinationSize);
+
+        const bool succeeded = ( bytes_sent == destinationSize );
+        if (succeeded)
+        {
+            fsync(dest_fd);
+        }
 
         close(src_fd);
         close(dest_fd);
 
-        return bytes_sent == destinationSize;
+        return succeeded;
     }
 }
