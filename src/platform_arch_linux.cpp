@@ -7,6 +7,7 @@
 #include <stdalign.h>
 #include <sys/inotify.h>
 #include <sys/eventfd.h>
+#include <sys/sendfile.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -176,5 +177,30 @@ namespace platform
 
         uint64_t u{ 1 };
         return write(event->shutdownDescriptor, &u, sizeof(uint64_t)) > 0;
+    }
+
+    bool copyFile(const char* source, const char* destination)
+    {
+        int src_fd = open(source, O_RDONLY);
+
+        if (src_fd < 0)
+        {
+            return false;
+        }
+
+        int dest_fd = open(destination, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (dest_fd < 0) {
+            close(src_fd);
+            return false;
+        }
+
+        const size_t destinationSize = getFileSize(source);
+
+        loff_t bytes_sent = sendfile(dest_fd, src_fd, nullptr, destinationSize);
+
+        close(src_fd);
+        close(dest_fd);
+
+        return bytes_sent == destinationSize;
     }
 }

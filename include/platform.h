@@ -22,4 +22,5 @@ namespace platform
     bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter);
     void closeFileWriteEvent(const FileWriteEvent* event);
     bool stopFileWatch(const FileWriteEvent* event);
+    bool copyFile(const char* source, const char* destination);
 }
