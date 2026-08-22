@@ -62,24 +62,31 @@ namespace platform
         return true;
     }
 
-    void* openLibrary(const char* path)
+    LibraryHandle::~LibraryHandle()
     {
-        return dlopen(path, RTLD_NOW | RTLD_LOCAL);
+        if (!m_handle)
+        {
+            return;
+        }
+
+        dlclose(m_handle);
     }
 
-    void* loadLibraryFunction(void* handle, const char* name)
+    std::unique_ptr<LibraryHandle> openLibrary(const char* path)
     {
-        if (!handle)
+        return std::make_unique<LibraryHandle>(dlopen(path, RTLD_NOW | RTLD_LOCAL));
+    }
+
+    void* loadLibraryFunction(const LibraryHandle* handle, const char* name)
+    {
+        void * libraryHandle = handle->getHandle();
+
+        if (!libraryHandle)
         {
             return nullptr;
         }
 
-        return dlsym(handle, name);
-    }
-
-    bool closeLibrary(void* handle)
-    {
-        return ( dlclose(handle) == 0 );
+        return dlsym(libraryHandle, name);
     }
 
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event)

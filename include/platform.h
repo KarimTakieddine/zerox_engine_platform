@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <cstddef>
+#include <memory>
 
 namespace platform
 {
@@ -13,11 +14,22 @@ namespace platform
         const char* targetFilename  { nullptr };
     };
 
+    class LibraryHandle
+    {
+    public:
+        LibraryHandle(void* handle) : m_handle(handle) { }
+
+        void* getHandle() const { return m_handle; }
+
+        ~LibraryHandle();
+    private:
+        void* m_handle{ nullptr };
+    };
+
     size_t getFileSize(const char* path);
     bool readFile(const char* path, char* buffer, size_t size);
-    void* openLibrary(const char* path);
-    void* loadLibraryFunction(void* handle, const char* name);
-    bool closeLibrary(void* handle);
+    std::unique_ptr<LibraryHandle> openLibrary(const char* path);
+    void* loadLibraryFunction(const LibraryHandle* handle, const char* name);
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event);
     bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter);
     void closeFileWriteEvent(const FileWriteEvent* event);
