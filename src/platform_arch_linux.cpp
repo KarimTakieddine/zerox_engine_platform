@@ -113,7 +113,7 @@ namespace platform
         return true;
     }
 
-    bool watchFileWrites(const char* path, const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter)
+    bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter)
     {
         pollfd fds[2] = {
             { .fd = event->eventDescriptor, .events = POLL_IN },
