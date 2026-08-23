@@ -47,6 +47,11 @@ namespace platform
         bool load(const char* path);
         bool isLoaded() const;
 
+        Format getFormat() const;
+        int getWidth() const;
+        int getHeight() const;
+        void* getData() const;
+
         ~Image();
     private:
         void free();

@@ -48,6 +48,26 @@ namespace platform
         return ( m_handle != nullptr );
     }
 
+    Image::Format Image::getFormat() const
+    {
+        return m_format;
+    }
+
+    int Image::getWidth() const
+    {
+        return m_width;
+    }
+
+    int Image::getHeight() const
+    {
+        return m_height;
+    }
+
+    void* Image::getData() const
+    {
+        return m_handle;
+    }
+
     Image::~Image()
     {
         free();
