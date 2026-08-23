@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20 REQUIRED)
 set(PROJECT_NAME zerox_engine_platform)
 set(INCLUDE_DIR include)
 set(SRC_DIR src)
+set(STB_DIR stb)
 
 Project(${PROJECT_NAME})
 
@@ -14,8 +15,10 @@ elseif(LINUX)
         ${SRC_DIR}/platform_arch_linux.cpp)
 endif()
 
+list(APPEND SOURCES ${SRC_DIR}/platform.cpp)
+
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${STB_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE uring)
