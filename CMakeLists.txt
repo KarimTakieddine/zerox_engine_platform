@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20 REQUIRED)
 set(PROJECT_NAME zerox_engine_platform)
 set(INCLUDE_DIR include)
 set(SRC_DIR src)
-set(STB_DIR stb)
+set(STB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 
 Project(${PROJECT_NAME})
 
