@@ -44,7 +44,7 @@ namespace platform
         Image(const Image& other) = delete;
         Image& operator=(const Image& other) = delete;
 
-        bool load(const char* path);
+        bool load(const char* path, bool flipVertical);
         bool isLoaded() const;
 
         Format getFormat() const;
@@ -71,5 +71,5 @@ namespace platform
     void closeFileWriteEvent(const FileWriteEvent* event);
     bool stopFileWatch(const FileWriteEvent* event);
     bool copyFile(const char* source, const char* destination);
-    std::unique_ptr<Image> loadImage(const char* path);
+    std::unique_ptr<Image> loadImage(const char* path, bool flipVertical);
 }

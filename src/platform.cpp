@@ -5,7 +5,7 @@
 
 namespace platform
 {
-    bool Image::load(const char* path)
+    bool Image::load(const char* path, bool flipVertical)
     {
         if (m_handle)
         {
@@ -14,7 +14,7 @@ namespace platform
 
         int channelCount{ 0 };
 
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(flipVertical);
 
         m_handle = stbi_load(path, &m_width, &m_height, &channelCount, 0);
 
@@ -75,11 +75,11 @@ namespace platform
         free();
     }
 
-    std::unique_ptr<Image> loadImage(const char* path)
+    std::unique_ptr<Image> loadImage(const char* path, bool flipVertical)
     {
         auto image = std::make_unique<Image>();
 
-        image->load(path);
+        image->load(path, flipVertical);
 
         return image;
     }
