@@ -14,6 +14,8 @@ namespace platform
 
         int channelCount{ 0 };
 
+        stbi_set_flip_vertically_on_load(true);
+
         m_handle = stbi_load(path, &m_width, &m_height, &channelCount, 0);
 
         if (!m_handle || m_width <= 0 || m_height <= 0 || channelCount <= 0)
