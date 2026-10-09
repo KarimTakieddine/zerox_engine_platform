@@ -162,7 +162,7 @@ namespace platform
                 {
                     auto* os_event = reinterpret_cast<struct inotify_event*>(&buffer[i]);
                     
-                    if ( ( os_event->mask & ( IN_CLOSE_WRITE | IN_CREATE | IN_MOVED_TO ) ) && ( strcmp(os_event->name, event->targetFilename) == 0 ) )
+                    if ( ( os_event->mask & ( IN_CLOSE_WRITE | IN_MOVED_TO ) ) && ( strcmp(os_event->name, event->targetFilename) == 0 ) )
                     {
                         writeCounter->fetch_add(1, std::memory_order_release);
                     }
