@@ -14,6 +14,7 @@ namespace platform
         EventHandle watchDescriptor     { NULL };
         EventHandle shutdownDescriptor  { NULL };
         const char* targetFilename      { nullptr };
+        const char* parentDirectory     { nullptr };
     };
 
     class Image
