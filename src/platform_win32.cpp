@@ -200,7 +200,7 @@ namespace platform
             event->shutdownDescriptor
         };
 
-        DWORD waitStatus = WaitForMultipleObjects(2, events, FALSE, INFINITE);
+        const DWORD waitStatus = WaitForMultipleObjects(2, events, FALSE, INFINITE);
 
         if (waitStatus == WAIT_OBJECT_0 + 1)
         {
@@ -217,7 +217,7 @@ namespace platform
 
                 while (currentRecord != nullptr)
                 {
-                    auto* notifyInfo = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(currentRecord);
+                    const auto* notifyInfo = reinterpret_cast<const FILE_NOTIFY_INFORMATION*>(currentRecord);
 
                     std::string fileName = WStringToStdString({ notifyInfo->FileName, notifyInfo->FileNameLength / sizeof(WCHAR) });
 
