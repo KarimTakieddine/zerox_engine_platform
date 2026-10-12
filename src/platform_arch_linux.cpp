@@ -106,6 +106,7 @@ namespace platform
 
         event->shutdownDescriptor   = shutdownDescriptor;
         event->targetFilename       = targetFilename;
+        event->parentDirectory      = parentDirectory;
 
         return true;
     }
