@@ -4,14 +4,16 @@
 #include <cstddef>
 #include <memory>
 
+#include "typedefs.h"
+
 namespace platform
 {
     struct FileWriteEvent
     {
-        int eventDescriptor         { -1 };
-        int watchDescriptor         { -1 };
-        int shutdownDescriptor      { -1 };
-        const char* targetFilename  { nullptr };
+        EventHandle eventDescriptor     { NULL };
+        EventHandle watchDescriptor     { NULL };
+        EventHandle shutdownDescriptor  { NULL };
+        const char* targetFilename      { nullptr };
     };
 
     class LibraryHandle
