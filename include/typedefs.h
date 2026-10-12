@@ -11,7 +11,7 @@ namespace platform
 	using LibraryHandle		= HMODULE;
 	using FunctionHandle	= FARPROC;
 #elif __linux__
-	using EnventHandle		= int;
+	using EventHandle		= int;
 	using LibraryHandle		= void*;
 	using FunctionHandle	= void*;
 #endif

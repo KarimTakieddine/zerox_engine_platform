@@ -16,21 +16,6 @@ namespace platform
         const char* targetFilename      { nullptr };
     };
 
-    /*class LibraryHandle
-    {
-    public:
-        LibraryHandle(void* handle) : m_handle(handle) { }
-
-        LibraryHandle(const LibraryHandle& other) = delete;
-        LibraryHandle& operator=(const LibraryHandle& other) = delete;
-
-        void* getHandle() const { return m_handle; }
-
-        ~LibraryHandle();
-    private:
-        void* m_handle{ nullptr };
-    };*/
-
     class Image
     {
     public:
