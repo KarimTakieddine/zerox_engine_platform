@@ -62,38 +62,19 @@ namespace platform
         return true;
     }
 
-    LibraryHandle::~LibraryHandle()
+    LibraryHandle openLibrary(const char* path)
     {
-        if (!m_handle)
-        {
-            return;
-        }
-
-        dlclose(m_handle);
+        return dlopen(path, RTLD_NOW | RTLD_LOCAL);
     }
 
-    std::unique_ptr<LibraryHandle> openLibrary(const char* path)
+    bool closeLibrary(LibraryHandle handle)
     {
-        void* handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
-
-        if (!handle)
-        {
-            return nullptr;
-        }
-
-        return std::make_unique<LibraryHandle>(handle);
+        return dlclose(handle) != 0;
     }
 
-    void* loadLibraryFunction(const LibraryHandle* handle, const char* name)
+    void* loadLibraryFunction(LibraryHandle handle, const char* name)
     {
-        void * libraryHandle = handle->getHandle();
-
-        if (!libraryHandle)
-        {
-            return nullptr;
-        }
-
-        return dlsym(libraryHandle, name);
+        return dlsym(handle, name);
     }
 
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event)
@@ -125,6 +106,7 @@ namespace platform
 
         event->shutdownDescriptor   = shutdownDescriptor;
         event->targetFilename       = targetFilename;
+        event->parentDirectory      = parentDirectory;
 
         return true;
     }

@@ -4,29 +4,17 @@
 #include <cstddef>
 #include <memory>
 
+#include "typedefs.h"
+
 namespace platform
 {
     struct FileWriteEvent
     {
-        int eventDescriptor         { -1 };
-        int watchDescriptor         { -1 };
-        int shutdownDescriptor      { -1 };
-        const char* targetFilename  { nullptr };
-    };
-
-    class LibraryHandle
-    {
-    public:
-        LibraryHandle(void* handle) : m_handle(handle) { }
-
-        LibraryHandle(const LibraryHandle& other) = delete;
-        LibraryHandle& operator=(const LibraryHandle& other) = delete;
-
-        void* getHandle() const { return m_handle; }
-
-        ~LibraryHandle();
-    private:
-        void* m_handle{ nullptr };
+        EventHandle eventDescriptor     { NULL };
+        EventHandle watchDescriptor     { NULL };
+        EventHandle shutdownDescriptor  { NULL };
+        const char* targetFilename      { nullptr };
+        const char* parentDirectory     { nullptr };
     };
 
     class Image
@@ -64,8 +52,9 @@ namespace platform
 
     size_t getFileSize(const char* path);
     bool readFile(const char* path, char* buffer, size_t size);
-    std::unique_ptr<LibraryHandle> openLibrary(const char* path);
-    void* loadLibraryFunction(const LibraryHandle* handle, const char* name);
+    LibraryHandle openLibrary(const char* path);
+    bool closeLibrary(LibraryHandle handle);
+    FunctionHandle loadLibraryFunction(LibraryHandle handle, const char* name);
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event);
     bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter);
     void closeFileWriteEvent(const FileWriteEvent* event);

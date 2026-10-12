@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.3.3 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.3.1 FATAL_ERROR)
 
 set(CMAKE_CXX_STANDARD 20 REQUIRED)
 
@@ -10,9 +10,9 @@ set(STB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/stb")
 Project(${PROJECT_NAME})
 
 if (WIN32)
+    list(APPEND SOURCES ${SRC_DIR}/platform_win32.cpp)
 elseif(LINUX)
-    list(APPEND SOURCES
-        ${SRC_DIR}/platform_arch_linux.cpp)
+    list(APPEND SOURCES ${SRC_DIR}/platform_arch_linux.cpp)
 endif()
 
 list(APPEND SOURCES ${SRC_DIR}/platform.cpp)
@@ -21,4 +21,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${STB_DIR})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC uring)
+if (WIN32)
+elseif(LINUX)
+    target_link_libraries(${PROJECT_NAME} PUBLIC uring)
+endif()
