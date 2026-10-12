@@ -51,38 +51,43 @@ namespace platform
         return ( size == numberOfBytesRead );
     }
 
-    std::unique_ptr<LibraryHandle> openLibrary(const char* path)
+    LibraryHandle openLibrary(const char* path)
     {
-
+        return LoadLibraryA(path);
     }
-    
-    void* loadLibraryFunction(const LibraryHandle* handle, const char* name)
-    {
 
+    bool closeLibrary(LibraryHandle handle)
+    {
+        return FreeLibrary(handle) != NULL;
+    }
+
+    FunctionHandle loadLibraryFunction(LibraryHandle handle, const char* name)
+    {
+        return GetProcAddress(handle, name);
     }
 
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event)
     {
-
+        return true;
     }
 
     bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter)
     {
-
+        return true;
     }
 
     void closeFileWriteEvent(const FileWriteEvent* event)
     {
-
+        
     }
 
     bool stopFileWatch(const FileWriteEvent* event)
     {
-
+        return true;
     }
 
     bool copyFile(const char* source, const char* destination)
     {
-
+        return CopyFile(source, destination, FALSE) != NULL;
     }
 }

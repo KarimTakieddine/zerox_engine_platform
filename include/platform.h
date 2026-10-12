@@ -16,7 +16,7 @@ namespace platform
         const char* targetFilename      { nullptr };
     };
 
-    class LibraryHandle
+    /*class LibraryHandle
     {
     public:
         LibraryHandle(void* handle) : m_handle(handle) { }
@@ -29,7 +29,7 @@ namespace platform
         ~LibraryHandle();
     private:
         void* m_handle{ nullptr };
-    };
+    };*/
 
     class Image
     {
@@ -66,8 +66,9 @@ namespace platform
 
     size_t getFileSize(const char* path);
     bool readFile(const char* path, char* buffer, size_t size);
-    std::unique_ptr<LibraryHandle> openLibrary(const char* path);
-    void* loadLibraryFunction(const LibraryHandle* handle, const char* name);
+    LibraryHandle openLibrary(const char* path);
+    bool closeLibrary(LibraryHandle handle);
+    FunctionHandle loadLibraryFunction(LibraryHandle handle, const char* name);
     bool initFileWriteEvent(const char* parentDirectory, const char* targetFilename, FileWriteEvent* event);
     bool watchFileWrites(const FileWriteEvent* event, std::atomic<uint64_t>* writeCounter);
     void closeFileWriteEvent(const FileWriteEvent* event);
