@@ -62,5 +62,5 @@ namespace platform
     bool stopFileWatch(const FileWriteEvent* event);
     bool copyFile(const char* source, const char* destination);
     std::unique_ptr<Image> loadImage(const char* path, bool flipVertical);
-    std::string getFormattedTime();
+    std::string getFormattedDateTime();
 }

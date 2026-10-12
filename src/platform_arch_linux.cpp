@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
@@ -204,5 +205,12 @@ namespace platform
         close(dest_fd);
 
         return succeeded;
+    }
+
+    std::string getFormattedDateTime()
+    {
+        std::chrono::time_point now = std::chrono::high_resolution_clock::now();
+
+        return std::format("{0:%F}T{0:%H}:{0:%M}:{0:%OS}:{0:%z}", now);
     }
 }

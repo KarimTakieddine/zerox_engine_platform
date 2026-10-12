@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -274,11 +275,18 @@ namespace platform
         return CopyFileA(source, destination, FALSE) != NULL;
     }
 
-    std::string getFormattedTime()
+    std::string getFormattedDateTime()
     {
-        SYSTEMTIME systemTime;
+        std::stringstream stream;
+
+        SYSTEMTIME systemTime; 
 
         GetLocalTime(&systemTime);
+
+        stream
+            << std::to_string(systemTime.wYear) << '-'
+            << std::to_string(systemTime.wMonth) << '-'
+            << std::to_string(systemTime.wDay) << 'T';
 
         int requiredSize = GetTimeFormatEx(
             LOCALE_NAME_USER_DEFAULT,
@@ -296,6 +304,10 @@ namespace platform
         std::wstring buffer(requiredSize, L'\0');
         GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &systemTime, nullptr, buffer.data(), requiredSize);
 
-        return ::WStringToStdString(buffer) + "." + std::to_string(systemTime.wMilliseconds);
+        stream
+            << ::WStringToStdString(buffer) << "."
+            << std::to_string(systemTime.wMilliseconds);
+
+        return stream.str();
     }
 }
