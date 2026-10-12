@@ -17,7 +17,7 @@ endif()
 
 list(APPEND SOURCES ${SRC_DIR}/platform.cpp)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${STB_DIR})
 
