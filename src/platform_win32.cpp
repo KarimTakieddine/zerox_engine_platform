@@ -273,4 +273,29 @@ namespace platform
     {
         return CopyFileA(source, destination, FALSE) != NULL;
     }
+
+    std::string getFormattedTime()
+    {
+        SYSTEMTIME systemTime;
+
+        GetLocalTime(&systemTime);
+
+        int requiredSize = GetTimeFormatEx(
+            LOCALE_NAME_USER_DEFAULT,
+            0,
+            &systemTime,
+            nullptr,
+            nullptr, 0
+        );
+
+        if (requiredSize == 0)
+        {
+            return "NON_TIME";
+        }
+
+        std::wstring buffer(requiredSize, L'\0');
+        GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &systemTime, nullptr, buffer.data(), requiredSize);
+
+        return ::WStringToStdString(buffer) + "." + std::to_string(systemTime.wMilliseconds);
+    }
 }
