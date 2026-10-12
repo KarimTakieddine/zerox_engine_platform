@@ -170,8 +170,8 @@ namespace platform
             return false;
         }
 
-        event->targetFilename   = targetFilename;
-        event->parentDirectory  = parentDirectory;
+        event->targetFilename   = std::string(targetFilename);
+        event->parentDirectory  = std::string(parentDirectory);
 
         return true;
     }
@@ -222,7 +222,7 @@ namespace platform
 
                     std::string fileName = WStringToStdString({ notifyInfo->FileName, notifyInfo->FileNameLength / sizeof(WCHAR) });
 
-                    if (strcmp(fileName.c_str(), event->targetFilename) == 0)
+                    if (strcmp(fileName.c_str(), event->targetFilename.c_str()) == 0)
                     {
                         switch (notifyInfo->Action)
                         {

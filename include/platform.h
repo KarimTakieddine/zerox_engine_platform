@@ -11,11 +11,12 @@ namespace platform
 {
     struct FileWriteEvent
     {
+        std::string targetFilename;
+        std::string parentDirectory;
+
         EventHandle eventDescriptor     { NULL };
         EventHandle watchDescriptor     { NULL };
         EventHandle shutdownDescriptor  { NULL };
-        const char* targetFilename      { nullptr };
-        const char* parentDirectory     { nullptr };
     };
 
     class Image
